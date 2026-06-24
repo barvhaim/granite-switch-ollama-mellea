@@ -1,0 +1,18 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+.idea
+.claude
+
+# Data / model artifacts (large, not for VCS)
+govt_chroma/
+govt.jsonl
+*.gguf
+.rag_io_cache/
