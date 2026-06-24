@@ -1,8 +1,8 @@
 # Granite Switch adapters via Ollama (Mac)
 
-Reproduces the [`granite-switch` tutorials'](../granite-switch/tutorials) adapter
+Reproduces the granite-switch tutorials adapter
 invocation — normally run through **Mellea + vLLM** — against a local
-**`ollama serve`** on a Mac, no GPU.
+**`ollama serve`** on a Mac with Metal GPU.
 
 ## The bridge
 
