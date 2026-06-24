@@ -35,11 +35,54 @@ endpoint (`raw: true`).
    logprobs (Ollama returns `top_logprobs`) and applies the io.yaml
    `likelihood` map (yes→1.0 / no→0.0), exactly like the vLLM path.
 
+## Setup: patched Ollama + the model
+
+The `granite-switch` arch isn't in stock Ollama — you need the patched build that
+registers the switched-LoRA graph, plus the model created from the GGUF. Full
+details are in the
+[patch doc](https://github.com/barvhaim/ollama/blob/feature/granite-switch/llama/compat/models/GRANITE_SWITCH.md);
+the short version:
+
+**Requirements (Apple-Silicon Mac):** Xcode CLT, CMake ≥ 3.24, Go, and ~16 GB
+unified memory for the f16 model (8.4 GB on disk). Metal is selected automatically.
+
+```bash
+# 1. Build the patched Ollama. The top-level cmake fetches the pinned llama.cpp
+#    (b9672), applies the granite-switch compat patch, and compiles the runner.
+git clone -b feature/granite-switch https://github.com/barvhaim/ollama.git
+cd ollama
+cmake -B build .                       # fetch + apply compat patches + configure
+cmake --build build --parallel 8       # build the llama-server runner (arch registered)
+go build -o ollama .                   # build the ollama CLI/server
+
+# 2. Get the GGUF — download the F16 build from the Hub:
+hf download barha/granite-switch-4.1-3b-preview-GGUF \
+  granite-switch-4.1-3b-preview-f16.gguf --local-dir .
+#    (or reuse an existing gs-f16.gguf; or convert from
+#    ibm-granite/granite-switch-4.1-3b-preview — see the patch doc.)
+
+# 3. Create the Ollama model from the GGUF (preserves the custom granite-switch.*
+#    keys, stacked LoRA tensors, and tokenizer/chat-template verbatim).
+GGUF=$PWD/granite-switch-4.1-3b-preview-f16.gguf \
+  ./llama/compat/models/granite-switch-ollama-verify.sh create
+
+# 4. Serve it (the patched ./ollama from step 1), then sanity-check:
+./ollama serve &                       # or run `./ollama run granite-switch`
+./ollama list | grep granite-switch
+```
+
+Point this project at that same GGUF so the client-side template render matches the
+served model:
+
+```bash
+export GRANITE_SWITCH_GGUF=$PWD/granite-switch-4.1-3b-preview-f16.gguf
+```
+
 ## Run
 
 ```bash
-# 1. ollama serve must be running with the granite-switch model created:
-#    see https://github.com/barvhaim/ollama/blob/feature/granite-switch/llama/compat/models/GRANITE_SWITCH.md
+# 1. The patched `ollama serve` must be running with the granite-switch model
+#    created (see Setup above):
 ollama list | grep granite-switch
 
 # 2. run the hello demo
@@ -124,6 +167,8 @@ corpus), Q6 → blocked out-of-scope (weather), Q7 → blocked harmful (forge an
 
 - The GGUF path defaults to `gs-f16.gguf` (in the working directory); override via
   the `GRANITE_SWITCH_GGUF` environment variable or `OllamaIntrinsicBackend(gguf_path=...)`.
+  The F16 GGUF is published at
+  [`barha/granite-switch-4.1-3b-preview-GGUF`](https://huggingface.co/barha/granite-switch-4.1-3b-preview-GGUF).
 - Guardian/core adapters use Mellea's shipped overlays (`granite-4.1-3b`). RAG
   adapters' io.yaml is fetched once from `ibm-granite/granitelib-rag-r1.0` and
   cached in `.rag_io_cache/`, so subsequent runs need no network for configs.
