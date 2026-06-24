@@ -13,7 +13,7 @@ divergence is visibly the per-token switch:
 
 Prereqs:
   - ``ollama serve`` running with the ``granite-switch`` model created
-    (see ollama/llama/compat/models/GRANITE_SWITCH.md)
+    (see https://github.com/barvhaim/ollama/blob/feature/granite-switch/llama/compat/models/GRANITE_SWITCH.md)
   - ``uv run main.py``  (mellea, jinja2, pyyaml, gguf are project deps)
 """
 

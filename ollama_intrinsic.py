@@ -13,7 +13,7 @@ Ollama doesn't render that template server-side. The granite-switch Ollama
 patch instead expects the control token to already be in the prompt and is
 driven through the **raw** ``/api/generate`` endpoint (``raw: true``), so the
 mid-sequence control token reaches the model untemplated. See
-``ollama/llama/compat/models/GRANITE_SWITCH.md``.
+https://github.com/barvhaim/ollama/blob/feature/granite-switch/llama/compat/models/GRANITE_SWITCH.md
 
 This module bridges the two. ``OllamaIntrinsicBackend``:
 

@@ -14,7 +14,8 @@ the model's chat template **server-side**, so the adapter's control token
 spot.
 
 Ollama doesn't render that template server-side. The
-[granite-switch Ollama patch](../ollama/llama/compat/models/GRANITE_SWITCH.md)
+[granite-switch Ollama patch](https://github.com/barvhaim/ollama/blob/feature/granite-switch/llama/compat/models/GRANITE_SWITCH.md)
+([`granite_switch.cpp`](https://github.com/barvhaim/ollama/blob/feature/granite-switch/llama/compat/models/granite_switch.cpp))
 recovers per-token adapter selection in the ggml graph and expects the control
 token to already be in the prompt — driven via the **raw** `/api/generate`
 endpoint (`raw: true`).
@@ -38,7 +39,7 @@ endpoint (`raw: true`).
 
 ```bash
 # 1. ollama serve must be running with the granite-switch model created:
-#    see ../ollama/llama/compat/models/GRANITE_SWITCH.md
+#    see https://github.com/barvhaim/ollama/blob/feature/granite-switch/llama/compat/models/GRANITE_SWITCH.md
 ollama list | grep granite-switch
 
 # 2. run the hello demo

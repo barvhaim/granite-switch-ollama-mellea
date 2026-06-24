@@ -22,7 +22,7 @@ Ollama's raw endpoint. See ``MELLEA.md`` and ``README.md`` for the bridge.
 
 Prereqs:
   - ``ollama serve`` running with the ``granite-switch`` model created
-    (see ollama/llama/compat/models/GRANITE_SWITCH.md)
+    (see https://github.com/barvhaim/ollama/blob/feature/granite-switch/llama/compat/models/GRANITE_SWITCH.md)
   - ``uv run hello_mellea.py``
 """
 

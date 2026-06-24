@@ -29,7 +29,7 @@ The flow has one exit per terminal state::
 
 Prereqs:
   - ``ollama serve`` running with the ``granite-switch`` model created
-    (see ollama/llama/compat/models/GRANITE_SWITCH.md)
+    (see https://github.com/barvhaim/ollama/blob/feature/granite-switch/llama/compat/models/GRANITE_SWITCH.md)
   - ``uv run rag_flow.py``  (first run downloads the embedding model + corpus
     and builds the ChromaDB index; subsequent runs load it instantly)
 """
