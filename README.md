@@ -55,7 +55,7 @@ cmake -B build .                       # fetch + apply compat patches + configur
 cmake --build build --parallel 8       # build the llama-server runner (arch registered)
 go build -o ollama .                   # build the ollama CLI/server
 
-# 2. Get the GGUF — download the F16 build from the Hub:
+# 2. Get the GGUF — download the F16 build (8.4 GB) from the Hub:
 hf download barha/granite-switch-4.1-3b-preview-GGUF \
   granite-switch-4.1-3b-preview-f16.gguf --local-dir .
 #    (or reuse an existing gs-f16.gguf; or convert from
@@ -69,12 +69,10 @@ GGUF=$PWD/granite-switch-4.1-3b-preview-f16.gguf \
 # 4. Serve it (the patched ./ollama from step 1), then sanity-check:
 ./ollama serve &                       # or run `./ollama run granite-switch`
 ./ollama list | grep granite-switch
-```
 
-Point this project at that same GGUF so the client-side template render matches the
-served model:
-
-```bash
+# 5. Point this project at that same GGUF so the client-side template render
+#    matches the served model (the code default is gs-f16.gguf, so this export
+#    is required unless you renamed the file):
 export GRANITE_SWITCH_GGUF=$PWD/granite-switch-4.1-3b-preview-f16.gguf
 ```
 
@@ -150,9 +148,23 @@ corpus), Q6 → blocked out-of-scope (weather), Q7 → blocked harmful (forge an
 | File | Purpose |
 |------|---------|
 | `ollama_intrinsic.py` | `OllamaIntrinsicBackend`: GGUF-template render + Ollama raw call + Mellea rewriter/processor reuse + ChromaDB retrieval |
-| `main.py` | Minimal hello demo: answerability, query_rewrite, guardian harm |
+| `main.py` | Minimal hello demo: answerability, query_rewrite, guardian harm — each shown OFF (base) vs ON (adapter fires) |
+| `hello_mellea.py` | Fuller `hello_mellea` tutorial: a minimal 6-adapter linear RAG flow (guardian → rewrite → answerability → clarification → answer → citations) over two hardcoded docs |
 | `rag_flow.py` | Full conversational RAG flow (`run_conversation_turn`) over the 7 tutorial queries |
 | `rag_corpus.py` | Vendored ChromaDB loader (govt mt-rag corpus, granite-embedding); Metal-aware device select |
+| `MELLEA.md` | What Mellea is and exactly which pieces (`IntrinsicsRewriter`/`IntrinsicsResultProcessor`) the bridge reuses |
+
+### Notebooks
+
+Notebook versions of the tutorials, adapted to run over Ollama instead of vLLM:
+
+| Notebook | Purpose |
+|----------|---------|
+| `hello_mellea_ollama.ipynb` | The `hello_mellea` tutorial: adapter functions, section by section |
+| `rag_101_ollama.ipynb` | RAG 101: corpus + answerability over the govt mt-rag subset |
+| `rag_flow_ollama.ipynb` | The 7-turn conversational RAG flow |
+| `walkthrough.ipynb` | Layer-by-layer trace of one guardian call (how the bridge drives an adapter end to end) |
+| `citations_deep_dive.ipynb` | The `<r>`/`<c>` citation span pipeline, decoded |
 
 ## Runs on Metal
 
