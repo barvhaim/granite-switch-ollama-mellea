@@ -11,6 +11,9 @@ wheels/
 .idea
 .claude
 
+# Jupyter
+.ipynb_checkpoints/
+
 # Data / model artifacts (large, not for VCS)
 govt_chroma/
 govt.jsonl
